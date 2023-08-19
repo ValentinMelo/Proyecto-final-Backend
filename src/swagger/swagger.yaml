@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: desafio 10
+  version: 1.0.0
+  description: desafio 10
+paths:
+  /api/products:
+    get:
+      summary: Obtiene todos los productos
+      responses:
+        '200':
+          description: Respuesta exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        code:
+          type: string
+          description: Código del producto
+        price:
+          type: number
+          description: Precio del producto
+        status:
+          type: boolean
+          description: Estado del producto
+        stock:
+          type: number
+          description: Stock del producto
+        category:
+          type: string
+          description: Categoría del producto
+        thumbnail:
+          type: string
+          description: URL de la imagen del producto
