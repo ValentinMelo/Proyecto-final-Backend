@@ -1,16 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Productos</title>
-  </head>
-  <body>
-    <h1>Listado de productos</h1>
-    <ul>
-      {{#each products}}
-        <li>{{this.title}} - {{this.description}}</li>
-      {{/each}}
-    </ul>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>Productos</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <h1>Listado de productos</h1>
+  <ul>
+    {{#each products}}
+      <li>
+        {{this.title}} - {{this.description}}
+        <button class="buy-button" data-amount="{{this.price}}" data-product="{{this.title}}">Comprar ahora</button>
+      </li>
+    {{/each}}
+  </ul>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const stripe = Stripe('pk_test_51Ngx06DhlPgMN7c96XavYGt155hkPkZkkJLE42RKr1hxvmvms9c8tbp3ZcZ0WZj5oP0sV59gxOrDmQyWuDa9Xuux00uKWyhoh6'); 
+      const elements = stripe.elements();
+
+      const buyButtons = document.querySelectorAll(".buy-button");
+      buyButtons.forEach(button => {
+        button.addEventListener("click", async (event) => {
+          const product = event.target.getAttribute("data-product");
+          const amount = parseInt(event.target.getAttribute("data-amount"));
+
+          try {
+            const response = await fetch("/api/pay", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ amount, currency: "usd" }),
+            });
+
+            const data = await response.json();
+
+        
+            if (response.ok) {
+              const { client_secret } = data;
+              const result = await stripe.confirmCardPayment(client_secret);
+
+              if (result.error) {
+                console.error("Pago fallido:", result.error);
+              } else {
+                console.log("Pago exitoso:", result.paymentIntent);
+                alert("¡Pago exitoso!");
+              }
+            } else {
+              console.error("Solicitud de pago fallida:", data.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        });
+      });
+    });
+  </script>
+</body>
 </html>
 

@@ -2,7 +2,7 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import ProductController from '../controllers/productController.js';
-import { handleError } from './errorHandler.js';
+import { handleError } from '/errorHandler.js';
 
 const productController = new ProductController();
 const router = express.Router();

@@ -2,6 +2,7 @@ import express from 'express';
 import ProductRoutes from './productRoutes.js';
 import CartRoutes from './cartRoutes.js';
 import TicketRoutes from './ticketRoutes.js';
+import UserRoutes from './authRoutes.js';
 import { faker } from '@faker-js/faker';
 import YAML from 'yamljs';
 import setupSwagger from '../swagger/swagger.js';
@@ -13,6 +14,7 @@ router.use(express.json());
 router.use('/products', ProductRoutes);
 router.use('/carts', CartRoutes);
 router.use('/tickets', TicketRoutes);
+router.use('/users', UserRoutes);
 
 // Endpoint para el Mocking de productos
 router.get('/mockingproducts', (req, res) => {
@@ -39,5 +41,4 @@ router.get('/swagger.yaml', (req, res) => {
 });
 
 export default router;
-
 setupSwagger(router);

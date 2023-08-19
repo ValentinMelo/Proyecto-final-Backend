@@ -1,6 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import User from '../models/user.js';
+import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
@@ -51,5 +52,49 @@ router.get(
   }
 );
 
+// Nueva ruta para obtener todos los usuarios con datos principales
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find({}, 'username email role'); 
+    res.json(users);
+  } catch (error) {
+    console.error(`Error al obtener usuarios: ${error}`);
+    res.status(500).json({ message: 'Error al obtener usuarios' });
+  }
+});
+
+// Nueva ruta para eliminar usuarios inactivos y enviar correos electrónicos
+router.delete('/', async (req, res) => {
+  try {
+    const cutoffTime = new Date(Date.now() - 30 * 60 * 1000); // Últimos 30 minutos
+    const inactiveUsers = await User.find({ lastConnection: { $lt: cutoffTime } });
+
+    for (const user of inactiveUsers) {
+      const transporter = nodemailer.createTransport({
+        service: 'servicio_de_correo', 
+        auth: {
+          user: 'correo_electronico',
+          pass: 'contraseña',
+        },
+      });
+
+      const mailOptions = {
+        from: 'correo_electronico',
+        to: user.email,
+        subject: 'Eliminación de cuenta por inactividad',
+        text: 'Tu cuenta ha sido eliminada debido a inactividad.',
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      await user.remove();
+    }
+
+    res.json({ message: 'Usuarios inactivos eliminados y notificados' });
+  } catch (error) {
+    console.error(`Error al eliminar usuarios inactivos: ${error}`);
+    res.status(500).json({ message: 'Error al eliminar usuarios inactivos' });
+  }
+});
 
 export default router;
