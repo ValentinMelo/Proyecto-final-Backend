@@ -1,16 +1,16 @@
 import Product from '../models/Product.js';
 import {
-  getAllProducts,
-  getProductById,
-  addProduct,
-  updateProduct,
-  deleteProduct,
+  getAllProducts as repositoryGetAllProducts,
+  getProductById as repositoryGetProductById,
+  addProduct as repositoryAddProduct,
+  updateProduct as repositoryUpdateProduct,
+  deleteProduct as repositoryDeleteProduct,
 } from '../repositories/productRepository.js';
 
 // Obtener todos los productos
 const getAllProducts = async (req, res) => {
   try {
-    const products = await getAllProducts();
+    const products = await repositoryGetAllProducts();
     res.render("index", { products });
   } catch (error) {
     console.log(error);
@@ -22,7 +22,7 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   const { pid } = req.params;
   try {
-    const product = await getProductById(pid);
+    const product = await repositoryGetProductById(pid);
     if (!product) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
@@ -37,7 +37,7 @@ const getProductById = async (req, res) => {
 const addProduct = async (req, res) => {
   const { title, description, price, code, stock, category, thumbnails, status } = req.body;
   try {
-    const newProduct = await addProduct({
+    const newProduct = await repositoryAddProduct({
       title,
       description,
       price,
@@ -59,7 +59,7 @@ const updateProduct = async (req, res) => {
   const { pid } = req.params;
   const { title, description, price, code, stock, category, thumbnails, status } = req.body;
   try {
-    const updatedProduct = await updateProduct(pid, {
+    const updatedProduct = await repositoryUpdateProduct(pid, {
       title,
       description,
       price,
@@ -83,7 +83,7 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   const { pid } = req.params;
   try {
-    const deletedProduct = await deleteProduct(pid);
+    const deletedProduct = await repositoryDeleteProduct(pid);
     if (!deletedProduct) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }

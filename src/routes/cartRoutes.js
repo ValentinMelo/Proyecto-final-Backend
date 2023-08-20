@@ -1,4 +1,7 @@
 import express from 'express';
+import YAML from 'yamljs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import {
   createCart,
   getCartById,
@@ -9,11 +12,13 @@ import {
   purchaseCart,
 } from '../controllers/cartController.js';
 import { handleError } from './errorHandler.js';
-import YAML from 'yamljs';
-import { swaggerUi, serve } from 'swagger-ui-express';
+import swaggerUi from 'swagger-ui-express';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = express.Router();
-const swaggerDocument = YAML.load('./swaggerCart.yaml');
+const swaggerDocument = YAML.load(__dirname + '/../swagger/swaggerCart.yaml');
 
 router.use(express.json());
 
@@ -87,6 +92,6 @@ router.post("/:cartId/purchase", (req, res) => {
   }
 });
 
-router.use('/api-docs', serve, swaggerUi.setup(swaggerDocument));
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 export default router;

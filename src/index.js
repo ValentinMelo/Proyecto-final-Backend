@@ -1,7 +1,6 @@
 import express from 'express';
 import winston from 'winston';
-import router from './routes/routes.js';
-import handlebars from 'express-handlebars';
+import { create as handlebarsCreate } from 'express-handlebars';
 import http from 'http';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
@@ -13,6 +12,7 @@ import passport from 'passport';
 import configurePassport from './passport.js';
 import { addLogger } from './utils/logger.js';
 import stripePackage from 'stripe';
+import router from './routes/routes.js';
 
 configurePassport(passport);
 
@@ -21,18 +21,13 @@ const port = 8080;
 
 const stripe = stripePackage('sk_test_51Ngx06DhlPgMN7c9NxcNmvAqNHar6w9LuKeXw9dGhwy7sXRr3zjBwI0WEWEyHCQVoGTRBGNMis9DgTRj5enWV2RA00Pd9R1n5M');
 
-const developmentLogger = winston.createLogger({
-  level: 'debug',
-  transports: [],
-});
-
-app.use(addLogger);
+// Configuración del motor de vistas
+const hbsEngine = handlebarsCreate({ defaultLayout: 'main' });
+app.engine('handlebars', hbsEngine);
+app.set('view engine', 'handlebars');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.engine('handlebars', handlebars());
-app.set('view engine', 'handlebars');
 
 app.use(cookieParser());
 app.use(
@@ -43,6 +38,8 @@ app.use(
   })
 );
 
+app.use(addLogger);
+
 app.use('/all-products', router);
 app.use('/api', router);
 app.use('/auth', authRoutes);
@@ -51,7 +48,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 io.on('connection', async (socket) => {
-  req.logger.debug(`Usuario conectado: ${socket.id}`);
+  console.log(`Usuario conectado: ${socket.id}`);
 
   try {
     const Product = mongoose.model('Product', {
@@ -68,7 +65,7 @@ io.on('connection', async (socket) => {
     const products = await Product.find();
     socket.emit('data', JSON.stringify(products));
   } catch (error) {
-    req.logger.error(`Error al obtener los productos de la base de datos: ${error}`);
+    console.error(`Error al obtener los productos de la base de datos: ${error}`);
   }
 });
 
@@ -112,7 +109,7 @@ app.post('/api/pay', async (req, res) => {
 });
 
 server.listen(port, () => {
-  req.logger.info(`Servidor arriba en el puerto ${port}`);
+  console.log(`Servidor arriba en el puerto ${port}`);
 });
 
 connectToDatabase();

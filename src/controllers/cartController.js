@@ -8,7 +8,7 @@ import {
   vaciarCarrito,
 } from '../repositories/cartRepository.js';
 import Product from '../models/Product.js';
-import Ticket from '../models/Ticket.js';
+import Ticket from '../models/ticketModel.js';
 
 // Crear un nuevo carrito
 const createCart = async (req, res) => {

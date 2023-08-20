@@ -6,9 +6,14 @@ import UserRoutes from './authRoutes.js';
 import { faker } from '@faker-js/faker';
 import YAML from 'yamljs';
 import setupSwagger from '../swagger/swagger.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = express.Router();
-const swaggerDocument = YAML.load('./swagger.yaml');
+const swaggerDocument = YAML.load(join(__dirname, '../swagger/swagger.yaml'));
 
 router.use(express.json());
 router.use('/products', ProductRoutes);
